@@ -28,10 +28,11 @@ import (
 )
 
 const bestiePort = 8000
-const databaseServiceName = "mysql"
-const databaseName = "bestie"
-const sessionDefaults = "database"
-const bestieImage = "quay.io/skattoju/bestie:v1"
+
+// const databaseServiceName = "mysql"
+// const databaseName = "bestie"
+// const sessionDefaults = "database"
+const bestieImage = "quay.io/mkong/bestiev2:2.0"
 
 var weight int32 = 100
 
@@ -152,9 +153,7 @@ func (r *BestieReconciler) bestieJob(bestie *petsv1.Bestie) *batchv1.Job {
 							"-c",
 						},
 						Args: []string{
-							"flask db migrate",
-							"flask db upgrade",
-							"flask seed all",
+							"flask db migrate & flask db upgrade & flask seed all",
 						},
 					}},
 					RestartPolicy: "OnFailure",
