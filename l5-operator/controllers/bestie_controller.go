@@ -34,6 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -42,6 +43,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var log = ctrllog.Log.WithName("controller_bestie")
@@ -172,22 +174,6 @@ func (r *BestieReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		// TODO: should we update then?
 	}
 
-	// reconcile route
-
-	// route := &routev1.Route{}
-
-	// err = r.Get(ctx, types.NamespacedName{Name: bestie.Name + "-route", Namespace: bestie.Namespace}, route)
-	// if err != nil {
-	// 	if errors.IsNotFound(err) {
-	// 		log.Info("Creating a new route for bestie")
-	// 		fileName := "config/resources/bestie-route.yaml"
-	// 		r.applyManifests(ctx, req, bestie, route, fileName)
-	// 	} else {
-	// 		return ctrl.Result{Requeue: true}, err
-	// 	}
-	// 	// TODO: should we update then?
-	// }
-
 	// Checking to see if cluster is an OpenShift cluster
 	isOpenShiftCluster, err := verifyOpenShiftCluster(routev1.GroupName, routev1.SchemeGroupVersion.Version)
 	if err != nil {
@@ -245,6 +231,29 @@ func (r *BestieReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&networkv1.Ingress{}).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 2}).
 		Complete(r)
+}
+
+func (r *BestieReconciler) routeForBestie(re *petsv1.Bestie) *routev1.Route {
+
+	route := &routev1.Route{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: re.Name,
+			Namespace: re.Namespace,
+			Labels: labelsForBestie(re.Name),
+		},
+		Spec: routev1.RouteSpec{
+			Port: &routev1.RoutePort{
+				TargetPort: intstr.FromInt(8000),
+			},
+			To: routev1.RouteTargetReference{
+				Kind: "Service",
+				Name: re.Name,
+			},
+		},
+	}
+	ctrl.SetControllerReference(re, route, r.Scheme)
+
+	return route
 }
 
 func verifyOpenShiftCluster(group string, version string) (bool, error) {
