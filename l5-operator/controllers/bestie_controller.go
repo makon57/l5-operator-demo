@@ -54,7 +54,14 @@ type BestieReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-type Export struct {
+const bestiePort = 8000
+
+// const databaseServiceName = "mysql"
+// const databaseName = "bestie"
+// const sessionDefaults = "database"
+
+func bestieAppServiceName(bestie *petsv1.Bestie) string {
+	return bestie.Name + "-service"
 }
 
 //+kubebuilder:rbac:groups=pets.bestie.com,resources=besties,verbs=get;list;watch;create;update;patch;delete
@@ -160,19 +167,19 @@ func (r *BestieReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 	// reconcile service
 
-	svc := &corev1.Service{}
+	// svc := &corev1.Service{}
 
-	err = r.Get(ctx, types.NamespacedName{Name: bestie.Name + "-service", Namespace: bestie.Namespace}, svc)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			log.Info("Creating a new service for bestie")
-			fileName := "config/resources/bestie-svc.yaml"
-			r.applyManifests(ctx, req, bestie, svc, fileName)
-		} else {
-			return ctrl.Result{Requeue: true}, err
-		}
-		// TODO: should we update then?
-	}
+	// err = r.Get(ctx, types.NamespacedName{Name: bestie.Name + "-service", Namespace: bestie.Namespace}, svc)
+	// if err != nil {
+	// 	if errors.IsNotFound(err) {
+	// 		log.Info("Creating a new service for bestie")
+	// 		fileName := "config/resources/bestie-svc.yaml"
+	// 		r.applyManifests(ctx, req, bestie, svc, fileName)
+	// 	} else {
+	// 		return ctrl.Result{Requeue: true}, err
+	// 	}
+	// 	// TODO: should we update then?
+	// }
 
 	// Checking to see if cluster is an OpenShift cluster
 	isOpenShiftCluster, err := verifyOpenShiftCluster(routev1.GroupName, routev1.SchemeGroupVersion.Version)
@@ -233,27 +240,72 @@ func (r *BestieReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *BestieReconciler) routeForBestie(re *petsv1.Bestie) *routev1.Route {
+// func (r *BestieReconciler) routeForBestie(re *petsv1.Bestie) *routev1.Route {
+
+// 	route := &routev1.Route{
+// 		ObjectMeta: metav1.ObjectMeta{
+// 			Name: re.Name,
+// 			Namespace: re.Namespace,
+// 			Labels: labelsForBestie(re.Name),
+// 		},
+// 		Spec: routev1.RouteSpec{
+// 			Port: &routev1.RoutePort{
+// 				TargetPort: intstr.FromInt(8000),
+// 			},
+// 			To: routev1.RouteTargetReference{
+// 				Kind: "Service",
+// 				Name: re.Name,
+// 			},
+// 		},
+// 	}
+// 	ctrl.SetControllerReference(re, route, r.Scheme)
+
+// 	return route
+// }
+
+func (r *BestieReconciler) bestieRoute(bestie *petsv1.Bestie) *routev1.Route {
+	labels := labels(bestie, "bestie")
 
 	route := &routev1.Route{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: re.Name,
-			Namespace: re.Namespace,
-			Labels: labelsForBestie(re.Name),
+			Name:      bestieAppServiceName(bestie),
+			Namespace: bestie.Namespace,
+			Labels:    labels,
 		},
 		Spec: routev1.RouteSpec{
-			Port: &routev1.RoutePort{
-				TargetPort: intstr.FromInt(8000),
-			},
+
 			To: routev1.RouteTargetReference{
-				Kind: "Service",
-				Name: re.Name,
+				Kind:   "Service",
+				Name:   bestieAppServiceName(bestie),
+				Weight: &weight,
 			},
 		},
 	}
-	ctrl.SetControllerReference(re, route, r.Scheme)
-
+	ctrl.SetControllerReference(bestie, route, r.Scheme)
 	return route
+}
+
+func (r *BestieReconciler) bestieAppService(bestie *petsv1.Bestie) *corev1.Service {
+	labels := labels(bestie, "bestie")
+
+	serv := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      bestieAppServiceName(bestie),
+			Namespace: bestie.Namespace,
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:     "LoadBalancer",
+			Ports: []corev1.ServicePort{{
+				Protocol:   corev1.ProtocolTCP,
+				Port:       80,
+				TargetPort: intstr.FromInt(8000),
+				NodePort:   0,
+			}},
+		},
+	}
+	ctrl.SetControllerReference(bestie, serv, r.Scheme)
+	return serv
 }
 
 func verifyOpenShiftCluster(group string, version string) (bool, error) {
