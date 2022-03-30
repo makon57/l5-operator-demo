@@ -1,3 +1,4 @@
+# prettier-ignore
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
@@ -32,14 +33,21 @@ spec:
       kind: Bestie
       name: besties.pets.bestie.com
       version: v1
-  description: The L5 operator is a Kubernetes and OpenShift compatible operator made to autopilot an application. It works alongside
-                the Postgres Crunchy Data operator to assist in the complete automation of an application from seamless upgrades, offsite
-                backups, rollbacks, and deep insights via metrics, logging, and events as well as autoscaling.
+  description: |
+    The L5 operator is a Kubernetes and OpenShift compatible operator made to autopilot an application.
+    It works alongside the Postgres Crunchy Data operator to assist in the complete automation of an
+    application from seamless upgrades, offsite backups, rollbacks, and deep insights via metrics, logging,
+    and events as well as autoscaling.
+
+    The L5 operator was originally created as a demo operator to demonstrate the 5 capability levels of an operator
+    for a conference. The requirements are defined here as we continue to develop the l5 operator to reach level 5
+    capabilities--autopilot.
+
+    See the [documentation]and examples on [github](https://github.com/opdev/l5-operator-demo) for more information.
   displayName: L5 Operator
   icon:
   - base64data: ""
-    mediatype: image/svg+xml
-
+    mediatype: ""
   install:
     spec:
       clusterPermissions:
