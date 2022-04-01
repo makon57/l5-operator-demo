@@ -40,8 +40,30 @@ spec:
     and events as well as autoscaling.
 
     The L5 operator was originally created as a demo operator to demonstrate the 5 capability levels of an operator
-    for a conference. The requirements are defined here as we continue to develop the l5 operator to reach level 5
-    capabilities--autopilot.
+    for a conference. The requirements are defined [here](https://docs.google.com/document/d/1gNa2NQzlsHDdNHBYPczCytkuokEzBCFKjlxM12X5cdk/edit?usp=sharing)
+    as we continue to develop the l5 operator to reach capability level 5--autopilot.
+
+    The L5 operator aims to provide your application with the following functionality:
+    * seamless upgrades
+    * offsite backups
+    * rollbacks
+    * deep isnights via metrics, logging, & events
+    * autoscaling
+
+
+    ## Usage
+
+    The L5 operator expects that a certificate manager is already available for usage. If a certificate manager
+    is not installed, please install a certificate manager for the operator to function as intended.
+
+    The L5 operator is compatible with both Kubernetes and OpenShift clusters, but with Kuberenetes please ensure that an
+    ingress controller is installed for the ingress to work properly.
+
+    The L5 operator works alongside the Crunchy Data PostgreSQL operator. Before installing the L5 operator, we highly encourage
+    you to install the Crunchy Data PostgreSQL operator beforehand. You can easily install the Crunchy Data PostgreSQL operator
+    via the OpenShift Container Platform when running on an OpenShift cluster or you can follow the directions [here](https://access.crunchydata.com/documentation/postgres-operator/4.7.5/installation/postgres-operator/)
+    provided by the Crunchy Data teamto install the Crunchy Data PostgreSQL operator, if you are running your application on a
+    vanilla Kubernetes cluster.
 
     See the [documentation]and examples on [github](https://github.com/opdev/l5-operator-demo) for more information.
   displayName: L5 Operator
