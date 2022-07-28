@@ -12,5 +12,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: controller
-  newName: quay.io/opdev/l5-operator
-  newTag: v0.0.2
+  newName: quay.io/mkong/bestie
+  newTag: v1
