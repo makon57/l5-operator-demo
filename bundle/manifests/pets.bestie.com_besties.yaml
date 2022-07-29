@@ -37,11 +37,6 @@ spec:
               image:
                 description: The bestie app image
                 type: string
-              maxReplicas:
-                description: MaxReplicas sets an upper bound to the autoscaling feature.
-                  If MaxReplicas is set autoscaling is enabled.
-                format: int32
-                type: integer
               size:
                 description: The size of the deployment
                 format: int32

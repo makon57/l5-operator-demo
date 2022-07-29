@@ -24,7 +24,6 @@ import (
 
 	routev1 "github.com/openshift/api/route/v1"
 	appsv1 "k8s.io/api/apps/v1"
-	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -118,7 +117,6 @@ func (r *BestieReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder.Owns(&appsv1.Deployment{})
 	builder.Owns(&corev1.Service{})
 	builder.Owns(&networkv1.Ingress{})
-	builder.Owns(&autoscalingv1.HorizontalPodAutoscaler{})
 	if util.IsRouteAPIAvailable() {
 		builder.Owns(&routev1.Route{})
 	}
