@@ -32,7 +32,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	petsv1 "github.com/opdev/l5-operator-demo/api/v1"
-	"github.com/opdev/l5-operator-demo/internal/bestie_metrics"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -132,9 +131,7 @@ func (r *DeploymentImageReconciler) upgradeOperand(ctx context.Context, bestie *
 			r.Log.Error(err, "Failed to update deployment")
 			return err
 		}
-		// Level 4 Add metrics
-		r.Log.Info("update metric : ApplicationUpgradeCounter")
-		bestie_metrics.ApplicationUpgradeCounter.Inc()
+
 	}
 	return nil
 }
@@ -200,13 +197,6 @@ func (r *DeploymentImageReconciler) updateApplicationStatus(ctx context.Context,
 		if pod.ObjectMeta.DeletionTimestamp == nil {
 			nonTerminatedPodList = append(nonTerminatedPodList, pod)
 		}
-	}
-
-	//Level 4 - Update metric.
-	if len(nonTerminatedPodList) > 0 {
-		rc := getPodstatusReason(nonTerminatedPodList)
-		r.Log.Info(fmt.Sprintf("update metric : ApplicationUpgradeFailure %f", rc))
-		bestie_metrics.ApplicationUpgradeFailure.Set(rc)
 	}
 
 	// Update status if needed.

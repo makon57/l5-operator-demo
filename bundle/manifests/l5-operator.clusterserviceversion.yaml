@@ -74,29 +74,9 @@ spec:
           verbs:
           - '*'
         - apiGroups:
-          - autoscaling
-          resources:
-          - horizontalpodautoscalers
-          verbs:
-          - create
-          - delete
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
           - batch
           resources:
           - jobs
-          verbs:
-          - '*'
-        - apiGroups:
-          - monitoring.coreos.com
-          resources:
-          - prometheuses
-          - prometheusrule
-          - servicemonitors
           verbs:
           - '*'
         - apiGroups:

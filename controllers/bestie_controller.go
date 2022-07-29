@@ -24,7 +24,6 @@ import (
 
 	routev1 "github.com/openshift/api/route/v1"
 	appsv1 "k8s.io/api/apps/v1"
-	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -53,7 +52,6 @@ type BestieReconciler struct {
 //+kubebuilder:rbac:groups="",resources=configmaps;endpoints;events;persistentvolumeclaims;pods;namespaces;secrets;serviceaccounts;services;services/finalizers,verbs=*
 //+kubebuilder:rbac:groups=postgres-operator.crunchydata.com,resources=postgresclusters,verbs=*
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=*
-//+kubebuilder:rbac:groups=monitoring.coreos.com,resources=prometheuses;servicemonitors;prometheusrule,verbs=*
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -91,7 +89,6 @@ func (r *BestieReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		srv1.NewDeploymentSizeReconciler(r.Client, log, r.Scheme),
 		srv1.NewDeploymentImageReconciler(r.Client, log, r.Scheme),
 		srv1.NewServiceReconciler(r.Client, log, r.Scheme),
-		srv1.NewServiceMonitorReconciler(r.Client, log, r.Scheme),
 		srv1.NewRouteReconciler(r.Client, log, r.Scheme),
 	}
 
@@ -118,7 +115,6 @@ func (r *BestieReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder.Owns(&appsv1.Deployment{})
 	builder.Owns(&corev1.Service{})
 	builder.Owns(&networkv1.Ingress{})
-	builder.Owns(&autoscalingv1.HorizontalPodAutoscaler{})
 	if util.IsRouteAPIAvailable() {
 		builder.Owns(&routev1.Route{})
 	}
