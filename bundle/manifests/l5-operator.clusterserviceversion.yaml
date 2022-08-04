@@ -12,7 +12,6 @@ metadata:
           },
           "spec": {
             "image": "quay.io/opdev/bestie",
-            "maxReplicas": 10,
             "size": 3,
             "version": "1.3"
           }
