@@ -9,14 +9,6 @@ spec:
   selector:
     matchLabels:
       app: bestie
-  strategy:
-    #This means the Deployment will roll one pod at a time, while ensuring no 
-    #pods are unavailable. So, for example, if there are ten pods, 
-    #the Deployment will ensure at least ten pods are available at one time.
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -59,20 +51,6 @@ spec:
         ports:
         - name: http
           containerPort: 8000
-        readinessProbe:
-          httpGet:
-            path: /foster
-            port: 8000
-          initialDelaySeconds: 15
-          timeoutSeconds: 1
-          periodSeconds: 15
-        livenessProbe:
-          httpGet:
-            path: /foster
-            port: 8000
-          initialDelaySeconds: 15
-          timeoutSeconds: 1
-          periodSeconds: 15
         resources:
           limits:
             cpu: 500m

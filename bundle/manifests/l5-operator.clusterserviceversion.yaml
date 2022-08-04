@@ -178,19 +178,6 @@ spec:
                 command:
                 - /manager
                 image: quay.io/opdev/l5-operator:v0.0.2
-                livenessProbe:
-                  httpGet:
-                    path: /healthz
-                    port: 8081
-                  initialDelaySeconds: 15
-                  periodSeconds: 20
-                name: manager
-                readinessProbe:
-                  httpGet:
-                    path: /readyz
-                    port: 8081
-                  initialDelaySeconds: 5
-                  periodSeconds: 10
                 resources:
                   limits:
                     cpu: 500m
